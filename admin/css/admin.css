@@ -183,6 +183,15 @@
 	color: #008a20;
 }
 
+/* Sub-field indent styling */
+tr.gnf-subfield-row td:first-child {
+	padding-left: 20px;
+}
+
+tr.gnf-subfield-row td {
+	background-color: #fdfdfd;
+}
+
 /* Preview Section */
 .gnf-preview-list {
 	display: grid;

@@ -24,7 +24,7 @@ final class GNF_Admin {
 		add_action( 'wp_ajax_gnf_import_config', [ $this, 'ajax_import_config' ] );
 	}
 
-	private function get_required_capability(): string {
+	public function get_required_capability(): string {
 		return (string) apply_filters( 'gnf_required_capability', 'manage_options' );
 	}
 
@@ -96,13 +96,13 @@ final class GNF_Admin {
 		}
 
 		$form_id     = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
-		$context_key = isset( $_POST['context_key'] ) ? sanitize_text_field( $_POST['context_key'] ) : (string) $form_id;
+		$context_key = isset( $_POST['context_key'] ) ? GNF_Validator::sanitize_context_key( $_POST['context_key'] ) : (string) $form_id;
 
-		if ( $form_id <= 0 ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid Form ID.', 'gravity-notification-filter' ) ], 400 );
+		if ( $form_id <= 0 || empty( $context_key ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid Form ID or Context.', 'gravity-notification-filter' ) ], 400 );
 		}
 
-		$fields        = GNF_Forms::get_form_fields( $form_id, $context_key );
+		$fields        = GNF_Forms::get_form_fields( $form_id, $context_key, false );
 		$notifications = GNF_Forms::get_form_notifications( $form_id );
 		$excluded      = GNF_Storage::get_excluded_fields_for_context( $context_key );
 
@@ -122,7 +122,7 @@ final class GNF_Admin {
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'gravity-notification-filter' ) ], 403 );
 		}
 
-		$context_key = isset( $_POST['context_key'] ) ? sanitize_text_field( $_POST['context_key'] ) : '';
+		$context_key = isset( $_POST['context_key'] ) ? GNF_Validator::sanitize_context_key( $_POST['context_key'] ) : '';
 		$field_ids   = isset( $_POST['field_ids'] ) && is_array( $_POST['field_ids'] ) ? $_POST['field_ids'] : [];
 
 		if ( empty( $context_key ) ) {

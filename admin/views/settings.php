@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 /**
- * Admin Settings View v1.1.2
+ * Admin Settings View v1.1.3
  *
  * @var array $forms Array of forms ['id' => int, 'title' => string]
  */
@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 	<h1 class="gnf-title">
 		<span class="dashicons dashicons-filter"></span>
 		<?php esc_html_e( 'Gravity Forms Notification Manager', 'gravity-notification-filter' ); ?>
-		<span class="gnf-badge">v1.1.2</span>
+		<span class="gnf-badge">v1.1.3</span>
 	</h1>
 
 	<div class="gnf-container">
@@ -75,7 +75,7 @@ defined( 'ABSPATH' ) || exit;
 				<section class="gnf-card">
 					<h2><?php esc_html_e( 'Fields Configuration', 'gravity-notification-filter' ); ?></h2>
 					<p class="description">
-						<?php esc_html_e( 'Check a box to HIDE the field from {all_fields} merge tag in notification emails.', 'gravity-notification-filter' ); ?>
+						<?php esc_html_e( 'Check a box to HIDE the field or sub-field from {all_fields} merge tag in notification emails.', 'gravity-notification-filter' ); ?>
 					</p>
 
 					<div class="gnf-table-wrapper">

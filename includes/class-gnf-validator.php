@@ -9,6 +9,11 @@ final class GNF_Validator {
 		return preg_match( '/^\d+(\.\d+)?$/', $clean ) ? $clean : '';
 	}
 
+	public static function sanitize_context_key( mixed $key ): string {
+		$clean = sanitize_text_field( (string) $key );
+		return preg_match( '/^\d+(_n_[a-zA-Z0-9]+)?$/', $clean ) ? $clean : '';
+	}
+
 	public static function sanitize_exclusions_array( mixed $input ): array {
 		if ( ! is_array( $input ) ) {
 			return [];
@@ -17,7 +22,7 @@ final class GNF_Validator {
 		$clean = [];
 
 		foreach ( $input as $key => $fields ) {
-			$clean_key = sanitize_text_field( (string) $key );
+			$clean_key = self::sanitize_context_key( $key );
 			if ( empty( $clean_key ) ) {
 				continue;
 			}

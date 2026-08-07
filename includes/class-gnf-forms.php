@@ -44,7 +44,7 @@ final class GNF_Forms {
 		return $notifications;
 	}
 
-	public static function get_form_fields( int $form_id, string $context_key = '' ): array {
+	public static function get_form_fields( int $form_id, string $context_key = '', bool $auto_clean = false ): array {
 		if ( ! class_exists( 'GFAPI' ) ) {
 			return [];
 		}
@@ -62,25 +62,48 @@ final class GNF_Forms {
 				continue;
 			}
 
-			$id          = (string) $field->id;
+			$parent_id   = (string) $field->id;
 			$label       = ! empty( $field->label ) ? $field->label : __( '(No Label)', 'gravity-notification-filter' );
 			$admin_label = ! empty( $field->adminLabel ) ? $field->adminLabel : '';
 			$type        = (string) $field->type;
 			$visibility  = (string) $field->visibility;
 
 			$fields[] = [
-				'id'          => $id,
+				'id'          => $parent_id,
 				'label'       => $label,
 				'admin_label' => $admin_label,
 				'type'        => $type,
 				'visibility'  => $visibility,
 				'is_admin'    => 'administrative' === $visibility,
+				'is_subfield' => false,
 			];
+			$existing_field_ids[] = $parent_id;
 
-			$existing_field_ids[] = $id;
+			// Sub-fields parsing (Complex Fields like Name, Address, etc.)
+			if ( ! empty( $field->inputs ) && is_array( $field->inputs ) ) {
+				foreach ( $field->inputs as $input ) {
+					if ( ! empty( $input['isHidden'] ) ) {
+						continue;
+					}
+
+					$sub_id    = (string) $input['id'];
+					$sub_label = ! empty( $input['label'] ) ? sprintf( '%s (%s)', $label, $input['label'] ) : $label;
+
+					$fields[] = [
+						'id'          => $sub_id,
+						'label'       => $sub_label,
+						'admin_label' => $admin_label,
+						'type'        => sprintf( '%s [sub-field]', $type ),
+						'visibility'  => $visibility,
+						'is_admin'    => 'administrative' === $visibility,
+						'is_subfield' => true,
+					];
+					$existing_field_ids[] = $sub_id;
+				}
+			}
 		}
 
-		if ( ! empty( $context_key ) ) {
+		if ( $auto_clean && ! empty( $context_key ) ) {
 			self::auto_clean_missing_fields( $context_key, $existing_field_ids );
 		}
 

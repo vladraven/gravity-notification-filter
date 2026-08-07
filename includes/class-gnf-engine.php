@@ -37,7 +37,12 @@ final class GNF_Engine {
 		$field_id        = (string) $field->id;
 		$notification_id = isset( $this->current_notification['id'] ) ? (string) $this->current_notification['id'] : '';
 
-		if ( GNF_Storage::is_field_excluded( $form_id, $field_id, $notification_id ) ) {
+		$is_excluded = GNF_Storage::is_field_excluded( $form_id, $field_id, $notification_id );
+
+		// Reset active notification tracking context after filter execution
+		$this->current_notification = [];
+
+		if ( $is_excluded ) {
 			return '';
 		}
 

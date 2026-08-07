@@ -12,11 +12,21 @@ final class GNF_Storage {
 	}
 
 	public static function get_excluded_fields_for_context( string $context_key ): array {
+		$clean_key = GNF_Validator::sanitize_context_key( $context_key );
+		if ( empty( $clean_key ) ) {
+			return [];
+		}
+
 		$all = self::get_all_exclusions();
-		return $all[ $context_key ] ?? [];
+		return $all[ $clean_key ] ?? [];
 	}
 
 	public static function save_context_exclusions( string $context_key, array $field_ids ): bool {
+		$clean_key = GNF_Validator::sanitize_context_key( $context_key );
+		if ( empty( $clean_key ) ) {
+			return false;
+		}
+
 		$all = self::get_all_exclusions();
 
 		$clean_field_ids = [];
@@ -30,9 +40,9 @@ final class GNF_Storage {
 		$clean_field_ids = array_values( array_unique( $clean_field_ids ) );
 
 		if ( empty( $clean_field_ids ) ) {
-			unset( $all[ $context_key ] );
+			unset( $all[ $clean_key ] );
 		} else {
-			$all[ $context_key ] = $clean_field_ids;
+			$all[ $clean_key ] = $clean_field_ids;
 		}
 
 		return update_option( self::OPTION_NAME, $all );

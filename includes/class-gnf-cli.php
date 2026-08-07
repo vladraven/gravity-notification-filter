@@ -100,4 +100,44 @@ final class GNF_CLI {
 		$exclusions = GNF_Storage::get_all_exclusions();
 		WP_CLI::line( json_encode( $exclusions, JSON_PRETTY_PRINT ) );
 	}
+
+	/**
+	 * Imports configuration from a JSON string or file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--json=<json_string>]
+	 * : Raw JSON configuration string.
+	 *
+	 * [--file=<file_path>]
+	 * : Path to JSON configuration file.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp gnf import --file=config.json
+	 */
+	public function import( array $args, array $assoc_args ): void {
+		$json_data = $assoc_args['json'] ?? '';
+		$file_path = $assoc_args['file'] ?? '';
+
+		if ( empty( $json_data ) && ! empty( $file_path ) ) {
+			if ( ! file_exists( $file_path ) ) {
+				WP_CLI::error( sprintf( 'File not found: %s', $file_path ) );
+			}
+			$json_data = file_get_contents( $file_path );
+		}
+
+		if ( empty( $json_data ) ) {
+			WP_CLI::error( 'Provide either --json or --file payload.' );
+		}
+
+		$validated = GNF_Validator::validate_json_import( $json_data );
+
+		if ( is_wp_error( $validated ) ) {
+			WP_CLI::error( $validated->get_error_message() );
+		}
+
+		GNF_Storage::update_all_exclusions( $validated );
+		WP_CLI::success( 'Configuration imported successfully.' );
+	}
 }
