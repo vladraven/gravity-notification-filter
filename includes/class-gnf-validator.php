@@ -4,6 +4,11 @@ defined( 'ABSPATH' ) || exit;
 
 final class GNF_Validator {
 
+	public static function sanitize_field_id( mixed $id ): string {
+		$clean = sanitize_text_field( (string) $id );
+		return preg_match( '/^\d+(\.\d+)?$/', $clean ) ? $clean : '';
+	}
+
 	public static function sanitize_exclusions_array( mixed $input ): array {
 		if ( ! is_array( $input ) ) {
 			return [];
@@ -11,9 +16,9 @@ final class GNF_Validator {
 
 		$clean = [];
 
-		foreach ( $input as $form_id => $fields ) {
-			$clean_form_id = absint( $form_id );
-			if ( $clean_form_id <= 0 ) {
+		foreach ( $input as $key => $fields ) {
+			$clean_key = sanitize_text_field( (string) $key );
+			if ( empty( $clean_key ) ) {
 				continue;
 			}
 
@@ -21,11 +26,18 @@ final class GNF_Validator {
 				continue;
 			}
 
-			$clean_fields = array_values( array_unique( array_map( 'absint', $fields ) ) );
-			$clean_fields = array_filter( $clean_fields, static fn( $id ) => $id > 0 );
+			$clean_fields = [];
+			foreach ( $fields as $field_id ) {
+				$sanitized_id = self::sanitize_field_id( $field_id );
+				if ( '' !== $sanitized_id ) {
+					$clean_fields[] = $sanitized_id;
+				}
+			}
+
+			$clean_fields = array_values( array_unique( $clean_fields ) );
 
 			if ( ! empty( $clean_fields ) ) {
-				$clean[ $clean_form_id ] = $clean_fields;
+				$clean[ $clean_key ] = $clean_fields;
 			}
 		}
 

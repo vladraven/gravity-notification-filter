@@ -3,7 +3,7 @@
  * Plugin Name: Gravity Forms Notification Filter
  * Plugin URI:  https://github.com/vladraven/gravity-notification-filter
  * Description: Allows administrators to control which Gravity Forms fields are included in the {all_fields} merge tag used by notification emails.
- * Version:     1.0.0
+ * Version:     1.1.2
  * Author:      Vladimir Klekovkin
  * Author URI:  https://github.com/vladraven
  * License:     MIT
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GNF_VERSION', '1.0.0' );
+define( 'GNF_VERSION', '1.1.2' );
 define( 'GNF_PLUGIN_FILE', __FILE__ );
 define( 'GNF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'GNF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

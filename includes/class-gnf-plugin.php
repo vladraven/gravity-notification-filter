@@ -25,6 +25,7 @@ final class GNF_Plugin {
 		require_once GNF_PLUGIN_PATH . 'includes/class-gnf-engine.php';
 		require_once GNF_PLUGIN_PATH . 'includes/class-gnf-settings.php';
 		require_once GNF_PLUGIN_PATH . 'includes/class-gnf-admin.php';
+		require_once GNF_PLUGIN_PATH . 'includes/class-gnf-cli.php';
 	}
 
 	private function init_hooks(): void {
@@ -48,7 +49,7 @@ final class GNF_Plugin {
 	}
 
 	public function deactivate(): void {
-		// Clean transients or temporary caches if needed in future
+		// Clean transients or temporary caches if necessary
 	}
 
 	public function init(): void {
@@ -61,6 +62,10 @@ final class GNF_Plugin {
 
 		if ( is_admin() ) {
 			GNF_Admin::instance()->init();
+		}
+
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			GNF_CLI::register_commands();
 		}
 	}
 

@@ -1,101 +1,50 @@
 === Gravity Forms Notification Filter ===
 Contributors: vladraven
+Tags: gravity forms, notifications, merge tags, email, privacy
 Requires at least: 6.2
-Tested up to: 6.8
+Tested up to: 6.6
 Requires PHP: 8.2
-Stable tag: 1.0.0
+Stable tag: 1.1.2
 License: MIT
 License URI: https://opensource.org/licenses/MIT
 
-Filter fields from the Gravity Forms {all_fields} merge tag without modifying forms, notifications, or custom code.
+Control which Gravity Forms fields are included in the {all_fields} merge tag in notification emails globally or per notification.
 
 == Description ==
 
-Gravity Forms Notification Filter allows administrators to control which fields are included in the {all_fields} merge tag used by notification emails.
+Gravity Forms Notification Filter gives WordPress administrators fine-grained control over the `{all_fields}` merge tag used in Gravity Forms email notifications.
 
-Instead of editing individual notifications, administrators can centrally exclude fields on a per-form basis.
-
-Features:
-
-* Native WordPress architecture
-* Gravity Forms API integration
-* Per-form field exclusion
-* Stores only excluded field IDs
-* Automatic cleanup of removed forms
-* Configuration export/import
-* WP-CLI support
-* PHP 8.2+ compatible
+= Key Features =
+* **Context-Aware Exclusion:** Exclude fields globally for a form OR per specific notification (e.g., hide tracking fields from client emails while keeping them for admins).
+* **ID-Based Storage:** Stores field IDs rather than labels, so configuration remains intact if fields are renamed.
+* **Support for Sub-Fields:** Full compatibility with multi-input fields (e.g. 1.3, 2.1).
+* **Quick Presets:** One-click exclusion of administrative and hidden fields.
+* **Zero jQuery Dependency:** Modern Vanilla ES6 JavaScript administration interface.
+* **WP-CLI Support:** Manage exclusions, import, and export configurations via command line.
+* **Import / Export:** Easily migrate rules between staging and production.
 
 == Installation ==
 
-1. Upload the plugin to the `/wp-content/plugins/` directory.
-2. Activate the plugin.
-3. Ensure Gravity Forms is installed and active.
-4. Open:
-
-Gravity Forms → Notification Filter
-
-5. Select a form.
-6. Check fields that should be hidden from `{all_fields}`.
-7. Save configuration.
-
-== Frequently Asked Questions ==
-
-= Does this change form entries? =
-
-No.
-
-The plugin only affects notification rendering when the `{all_fields}` merge tag is generated.
-
-= Are fields deleted? =
-
-No.
-
-Fields remain available in:
-
-* Entries
-* Exports
-* Gravity Forms administration
-
-Only notification output is filtered.
-
-= What data is stored? =
-
-Only excluded field IDs.
-
-Example:
-
-{
-    "2": [14, 17, 18],
-    "5": [7, 9]
-}
-
-= Does renaming fields break configuration? =
-
-No.
-
-The plugin stores field IDs rather than labels.
-
-== Screenshots ==
-
-1. Form selector
-2. Field exclusion settings
-3. Notification preview
-4. Import/export tools
+1. Upload the `gravity-notification-filter` folder to the `/wp-content/plugins/` directory.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Navigate to **Forms -> Notification Manager** to configure field exclusions.
 
 == Changelog ==
 
+= 1.1.2 =
+* Fix: Sanitization and support for decimal sub-field IDs (e.g. 1.3).
+* Fix: Added payload size boundary checks for import/export in admin JS.
+* Optimization: Cleared active notification tracking state upon tag filter completions.
+
+= 1.1.1 =
+* Bugfix: Resolved context dropdown value reset in JS interface upon AJAX reloads.
+* Bugfix: Corrected storage key alignment for notification-specific exclusions.
+* Optimization: Ensured full array key deletion when clearing all checkboxes.
+
+= 1.1.0 =
+* Feature: Added Notification Context support (separate rules per notification).
+* Feature: Added Quick Presets (Hide All Admin Fields, Reset).
+* Feature: WP-CLI Integration (`wp gnf list`, `wp gnf exclude`, `wp gnf export`).
+
 = 1.0.0 =
-
-* Initial release
-* Field exclusion engine
-* Settings UI
-* Import/export support
-* WP-CLI integration
-* Automatic configuration cleanup
-
-== Upgrade Notice ==
-
-= 1.0.0 =
-
-Initial release.
+* Initial Release.

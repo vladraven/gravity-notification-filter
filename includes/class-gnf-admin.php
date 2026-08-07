@@ -14,14 +14,12 @@ final class GNF_Admin {
 	}
 
 	public function init(): void {
-		// Priority 20 guarantees Gravity Forms parent menu 'gf_edit_forms' exists
 		add_action( 'admin_menu', [ $this, 'register_menu_page' ], 20 );
 		add_action( 'admin_init', [ 'GNF_Settings', 'register_settings' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
-		// AJAX Endpoints
 		add_action( 'wp_ajax_gnf_get_form_fields', [ $this, 'ajax_get_form_fields' ] );
-		add_action( 'wp_ajax_gnf_save_form_exclusions', [ $this, 'ajax_save_form_exclusions' ] );
+		add_action( 'wp_ajax_gnf_save_context_exclusions', [ $this, 'ajax_save_context_exclusions' ] );
 		add_action( 'wp_ajax_gnf_export_config', [ $this, 'ajax_export_config' ] );
 		add_action( 'wp_ajax_gnf_import_config', [ $this, 'ajax_import_config' ] );
 	}
@@ -97,37 +95,41 @@ final class GNF_Admin {
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'gravity-notification-filter' ) ], 403 );
 		}
 
-		$form_id = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+		$form_id     = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
+		$context_key = isset( $_POST['context_key'] ) ? sanitize_text_field( $_POST['context_key'] ) : (string) $form_id;
+
 		if ( $form_id <= 0 ) {
 			wp_send_json_error( [ 'message' => __( 'Invalid Form ID.', 'gravity-notification-filter' ) ], 400 );
 		}
 
-		$fields   = GNF_Forms::get_form_fields( $form_id );
-		$excluded = GNF_Storage::get_excluded_fields_for_form( $form_id );
+		$fields        = GNF_Forms::get_form_fields( $form_id, $context_key );
+		$notifications = GNF_Forms::get_form_notifications( $form_id );
+		$excluded      = GNF_Storage::get_excluded_fields_for_context( $context_key );
 
 		wp_send_json_success(
 			[
-				'fields'   => $fields,
-				'excluded' => $excluded,
+				'fields'        => $fields,
+				'notifications' => $notifications,
+				'excluded'      => $excluded,
 			]
 		);
 	}
 
-	public function ajax_save_form_exclusions(): void {
+	public function ajax_save_context_exclusions(): void {
 		check_ajax_referer( 'gnf_admin_nonce', 'nonce' );
 
 		if ( ! $this->check_user_permission() ) {
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'gravity-notification-filter' ) ], 403 );
 		}
 
-		$form_id   = isset( $_POST['form_id'] ) ? absint( $_POST['form_id'] ) : 0;
-		$field_ids = isset( $_POST['field_ids'] ) && is_array( $_POST['field_ids'] ) ? $_POST['field_ids'] : [];
+		$context_key = isset( $_POST['context_key'] ) ? sanitize_text_field( $_POST['context_key'] ) : '';
+		$field_ids   = isset( $_POST['field_ids'] ) && is_array( $_POST['field_ids'] ) ? $_POST['field_ids'] : [];
 
-		if ( $form_id <= 0 ) {
-			wp_send_json_error( [ 'message' => __( 'Invalid Form ID.', 'gravity-notification-filter' ) ], 400 );
+		if ( empty( $context_key ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid Context Key.', 'gravity-notification-filter' ) ], 400 );
 		}
 
-		GNF_Storage::save_form_exclusions( $form_id, $field_ids );
+		GNF_Storage::save_context_exclusions( $context_key, $field_ids );
 
 		wp_send_json_success( [ 'message' => __( 'Settings saved successfully.', 'gravity-notification-filter' ) ] );
 	}

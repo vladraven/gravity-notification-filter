@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 /**
- * Admin Settings View
+ * Admin Settings View v1.1.2
  *
  * @var array $forms Array of forms ['id' => int, 'title' => string]
  */
@@ -10,6 +10,7 @@ defined( 'ABSPATH' ) || exit;
 	<h1 class="gnf-title">
 		<span class="dashicons dashicons-filter"></span>
 		<?php esc_html_e( 'Gravity Forms Notification Manager', 'gravity-notification-filter' ); ?>
+		<span class="gnf-badge">v1.1.2</span>
 	</h1>
 
 	<div class="gnf-container">
@@ -38,10 +39,18 @@ defined( 'ABSPATH' ) || exit;
 		<!-- Main Workspace -->
 		<main class="gnf-main">
 			<div id="gnf-loading" class="gnf-loading" style="display:none;">
-				<span class="spinner is-active"></span> <?php esc_html_e( 'Loading fields...', 'gravity-notification-filter' ); ?>
+				<span class="spinner is-active"></span> <?php esc_html_e( 'Loading workspace...', 'gravity-notification-filter' ); ?>
 			</div>
 
 			<div id="gnf-workspace" class="gnf-workspace">
+				<!-- Context Switcher (Global vs Notification) -->
+				<div class="gnf-context-bar">
+					<label for="gnf-notification-select"><strong><?php esc_html_e( 'Notification Context:', 'gravity-notification-filter' ); ?></strong></label>
+					<select id="gnf-notification-select">
+						<option value="global"><?php esc_html_e( 'Global (All Notifications for this form)', 'gravity-notification-filter' ); ?></option>
+					</select>
+				</div>
+
 				<!-- Header Controls -->
 				<header class="gnf-workspace-header">
 					<div class="gnf-search-box">
@@ -54,6 +63,13 @@ defined( 'ABSPATH' ) || exit;
 						<button type="button" class="gnf-tab" data-filter="admin"><?php esc_html_e( 'Administrative', 'gravity-notification-filter' ); ?></button>
 					</div>
 				</header>
+
+				<!-- Quick Presets Tool -->
+				<div class="gnf-presets-bar">
+					<span><strong><?php esc_html_e( 'Presets:', 'gravity-notification-filter' ); ?></strong></span>
+					<button type="button" id="gnf-preset-hide-admin" class="button button-small"><?php esc_html_e( 'Hide All Admin Fields', 'gravity-notification-filter' ); ?></button>
+					<button type="button" id="gnf-preset-show-all" class="button button-small"><?php esc_html_e( 'Show All Fields (Reset)', 'gravity-notification-filter' ); ?></button>
+				</div>
 
 				<!-- Field List Table -->
 				<section class="gnf-card">
