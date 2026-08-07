@@ -15,23 +15,16 @@ final class GNF_Engine {
 	}
 
 	public function init(): void {
-		// Track active notification context before email generation
+		// Sets the active notification context for the current email generation pass.
+		// When GF switches to the next notification, this filter fires again and updates the state atomically.
 		add_filter( 'gform_notification', [ $this, 'track_active_notification' ], 10, 3 );
 
-		// Clear notification context after Gravity Forms finishes building the notification
-		add_filter( 'gform_notification', [ $this, 'clear_active_notification' ], 1000, 1 );
-
-		// Main merge tag filter (fires per field inside {all_fields})
+		// Main merge tag filter (evaluates every field rendered inside {all_fields})
 		add_filter( 'gform_merge_tag_filter', [ $this, 'filter_all_fields_merge_tag' ], 10, 6 );
 	}
 
 	public function track_active_notification( array $notification, array $form, array $entry ): array {
 		$this->current_notification = $notification;
-		return $notification;
-	}
-
-	public function clear_active_notification( array $notification ): array {
-		$this->current_notification = [];
 		return $notification;
 	}
 
