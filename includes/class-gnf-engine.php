@@ -71,6 +71,10 @@ final class GNF_Engine {
 			return $value;
 		}
 
+		if ( '' === $this->current_notification_id ) {
+			return $value;
+		}
+
 		if ( ! is_object( $field ) ) {
 			return $value;
 		}

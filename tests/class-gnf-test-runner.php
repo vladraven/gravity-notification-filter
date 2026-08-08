@@ -456,251 +456,251 @@ final class GNF_Test_Runner {
 		}
 	}
 
-	private function run_engine_tests(): void {
-		$engine = GNF_Engine::instance();
+private function run_engine_tests(): void {
+	$engine = GNF_Engine::instance();
 
-		$this->assert_same(
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
 			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'other_tag',
-				'',
-				$this->make_test_field( 999996, '3' ),
-				'',
-				''
-			),
-			'Engine leaves non-all-fields merge tag unchanged'
+			'other_tag',
+			'',
+			$this->make_test_field( 999996, '3' ),
+			'',
+			''
+		),
+		'Engine leaves non-all-fields merge tag unchanged'
+	);
+
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
+			'original value',
+			'all_fields',
+			'',
+			new stdClass(),
+			'',
+			''
+		),
+		'Engine leaves invalid field object unchanged'
+	);
+
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
+			'original value',
+			'all_fields',
+			'',
+			$this->make_test_field( 0, '3' ),
+			'',
+			''
+		),
+		'Engine leaves invalid form ID unchanged'
+	);
+
+	$form_id = 999996;
+
+	$global_key =
+		GNF_Storage::make_context_key(
+			$form_id
 		);
 
-		$this->assert_same(
-			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				new stdClass(),
-				'',
-				''
-			),
-			'Engine leaves invalid field object unchanged'
+	$notification_a_key =
+		GNF_Storage::make_context_key(
+			$form_id,
+			'notification_a'
 		);
 
-		$this->assert_same(
-			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field( 0, '3' ),
-				'',
-				''
-			),
-			'Engine leaves invalid form ID unchanged'
+	$notification_b_key =
+		GNF_Storage::make_context_key(
+			$form_id,
+			'notification_b'
 		);
 
-		$form_id = 999996;
+	GNF_Storage::save_context_exclusions(
+		$global_key,
+		[
+			'3',
+		]
+	);
 
-		$global_key =
-			GNF_Storage::make_context_key(
-				$form_id
-			);
+	GNF_Storage::save_context_exclusions(
+		$notification_a_key,
+		[
+			'4',
+		]
+	);
 
-		$notification_a_key =
-			GNF_Storage::make_context_key(
+	GNF_Storage::save_context_exclusions(
+		$notification_b_key,
+		[
+			'5',
+		]
+	);
+
+	$engine->reset();
+
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
+			'original value',
+			'all_fields',
+			'',
+			$this->make_test_field(
 				$form_id,
-				'notification_a'
-			);
+				'3'
+			),
+			'',
+			''
+		),
+		'Engine does not apply global exclusion without notification context'
+	);
 
-		$notification_b_key =
-			GNF_Storage::make_context_key(
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
+			'original value',
+			'all_fields',
+			'',
+			$this->make_test_field(
 				$form_id,
-				'notification_b'
-			);
-
-		GNF_Storage::save_context_exclusions(
-			$global_key,
-			[
-				'3',
-			]
-		);
-
-		GNF_Storage::save_context_exclusions(
-			$notification_a_key,
-			[
-				'4',
-			]
-		);
-
-		GNF_Storage::save_context_exclusions(
-			$notification_b_key,
-			[
-				'5',
-			]
-		);
-
-		$engine->reset();
-
-		$this->assert_same(
+				'4'
+			),
 			'',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'3'
-				),
-				'',
-				''
-			),
-			'Engine excludes globally excluded field'
-		);
+			''
+		),
+		'Engine does not apply notification exclusion without notification context'
+	);
 
-		$this->assert_same(
+	$engine->track_notification(
+		[
+			'id' => 'notification_a',
+		],
+		[],
+		[]
+	);
+
+	$this->assert_same(
+		'',
+		$engine->filter_all_fields_merge_tag(
 			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'4'
-				),
-				'',
-				''
-			),
-			'Engine does not apply notification exclusion without notification context'
-		);
-
-		$engine->track_notification(
-			[
-				'id' => 'notification_a',
-			],
-			[],
-			[]
-		);
-
-		$this->assert_same(
+			'all_fields',
 			'',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'4'
-				),
-				'',
-				''
+			$this->make_test_field(
+				$form_id,
+				'4'
 			),
-			'Engine excludes notification-specific field'
-		);
-
-		$this->assert_same(
 			'',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'3'
-				),
-				'',
-				''
-			),
-			'Engine keeps global exclusion inside notification context'
-		);
+			''
+		),
+		'Engine excludes notification-specific field'
+	);
 
-		$this->assert_same(
+	$this->assert_same(
+		'',
+		$engine->filter_all_fields_merge_tag(
 			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'5'
-				),
-				'',
-				''
-			),
-			'Engine does not apply another notification exclusion'
-		);
-
-		$engine->track_notification(
-			[
-				'id' => 'notification_b',
-			],
-			[],
-			[]
-		);
-
-		$this->assert_same(
+			'all_fields',
 			'',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'5'
-				),
-				'',
-				''
+			$this->make_test_field(
+				$form_id,
+				'3'
 			),
-			'Engine applies second notification exclusion'
-		);
+			'',
+			''
+		),
+		'Engine keeps global exclusion inside notification context'
+	);
 
-		$this->assert_same(
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
 			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'4'
-				),
-				'',
-				''
+			'all_fields',
+			'',
+			$this->make_test_field(
+				$form_id,
+				'5'
 			),
-			'Engine isolates notification contexts'
-		);
+			'',
+			''
+		),
+		'Engine does not apply another notification exclusion'
+	);
 
-		$engine->reset();
+	$engine->track_notification(
+		[
+			'id' => 'notification_b',
+		],
+		[],
+		[]
+	);
 
-		$this->assert_same(
+	$this->assert_same(
+		'',
+		$engine->filter_all_fields_merge_tag(
 			'original value',
-			$engine->filter_all_fields_merge_tag(
-				'original value',
-				'all_fields',
-				'',
-				$this->make_test_field(
-					$form_id,
-					'4'
-				),
-				'',
-				''
+			'all_fields',
+			'',
+			$this->make_test_field(
+				$form_id,
+				'5'
 			),
-			'Engine reset clears notification context'
-		);
+			'',
+			''
+		),
+		'Engine applies second notification exclusion'
+	);
 
-		GNF_Storage::save_context_exclusions(
-			$global_key,
-			[]
-		);
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
+			'original value',
+			'all_fields',
+			'',
+			$this->make_test_field(
+				$form_id,
+				'4'
+			),
+			'',
+			''
+		),
+		'Engine isolates notification contexts'
+	);
 
-		GNF_Storage::save_context_exclusions(
-			$notification_a_key,
-			[]
-		);
+	$engine->reset();
 
-		GNF_Storage::save_context_exclusions(
-			$notification_b_key,
-			[]
-		);
-	}
+	$this->assert_same(
+		'original value',
+		$engine->filter_all_fields_merge_tag(
+			'original value',
+			'all_fields',
+			'',
+			$this->make_test_field(
+				$form_id,
+				'3'
+			),
+			'',
+			''
+		),
+		'Engine reset clears notification context'
+	);
+
+	GNF_Storage::save_context_exclusions(
+		$global_key,
+		[]
+	);
+
+	GNF_Storage::save_context_exclusions(
+		$notification_a_key,
+		[]
+	);
+
+	GNF_Storage::save_context_exclusions(
+		$notification_b_key,
+		[]
+	);
+}
 
 	private function make_test_field(
 		int $form_id,
