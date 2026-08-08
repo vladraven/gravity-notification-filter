@@ -27,14 +27,14 @@ Global exclusions apply to every notification belonging to a form. Notification-
 * Global exclusions are inherited by individual notifications.
 * Notification-specific exclusions remain isolated between notifications.
 * Search and filter form fields.
-* Hide administrative fields with a preset.
-* Show all fields with a preset.
+* Presets for common field exclusion configurations.
 * Preview effective field visibility.
 * Export configuration as JSON.
 * Import configuration from JSON.
 * Built-in diagnostics and automated tests.
 * Run tests directly from the WordPress admin.
 * Run tests from the command line without Composer.
+* Automatically clean obsolete field exclusions.
 
 == Requirements ==
 
@@ -44,12 +44,12 @@ Global exclusions apply to every notification belonging to a form. Notification-
 
 == Installation ==
 
-1. Upload the `gravity-notification-filter` directory to `/wp-content/plugins/`.
+1. Upload the gravity-notification-filter directory to /wp-content/plugins/.
 2. Activate the plugin through the WordPress Plugins screen.
-3. Open the Gravity Forms Notification Filter settings page.
+3. Open the Gravity Forms Notification Filter administration page.
 4. Select a form.
 5. Select Global or an individual notification.
-6. Configure the fields that should be excluded from `{all_fields}`.
+6. Configure the fields that should be excluded from {all_fields}.
 7. Save the configuration.
 
 == Configuration ==
@@ -63,38 +63,91 @@ Notification-specific exclusions apply only to the selected notification.
 For example:
 
 Global:
+
 * Field 3
 * Field 3.1
 
 Notification A:
+
 * Field 4
 
 Notification B:
+
 * Field 5
 
 The effective exclusions are:
 
 Notification A:
+
 * Field 3
 * Field 3.1
 * Field 4
 
 Notification B:
+
 * Field 3
 * Field 3.1
 * Field 5
+
+== Sub-Fields ==
+
+Gravity Forms fields containing multiple inputs are supported.
+
+Sub-fields can be excluded independently from their parent fields.
+
+Examples:
+
+* 1.3
+* 2.1
+* 3.4
+
+== Presets ==
+
+The plugin provides presets for common configurations.
+
+Hide All Administrative Fields excludes fields marked as administrative by Gravity Forms.
+
+Show All Fields removes the configured exclusions for the current context.
+
+== Import and Export ==
+
+Configuration can be exported as JSON.
+
+Example:
+
+{
+"12": [
+"3",
+"3.1"
+],
+"12_n_abc123": [
+"4"
+]
+}
+
+The numeric key represents the global form context.
+
+A notification-specific context uses the form ID followed by *n* and the notification ID.
+
+Imported configurations are validated and sanitized before being stored.
 
 == Diagnostics ==
 
 The plugin includes a built-in test runner.
 
-Tests can be executed from the WordPress admin interface using the Test Plugin button.
+Tests can be executed from the WordPress administration interface using the Test Plugin button.
 
 Tests can also be executed from the command line:
 
 php tests/test.php
 
-The test suite covers validation, storage, form discovery, notification handling, exclusion inheritance, notification isolation, and `{all_fields}` filtering.
+The current test suite contains 69 automated tests.
+
+Current result:
+
+Tests: 69
+Passed: 69
+Failed: 0
 
 == Frequently Asked Questions ==
 
@@ -102,9 +155,9 @@ The test suite covers validation, storage, form discovery, notification handling
 
 No. Composer is not required.
 
-= Does it modify Gravity Forms field values? =
+= Does the plugin modify Gravity Forms field values? =
 
-No. The plugin controls the fields included in the `{all_fields}` notification merge tag.
+No. The plugin controls which fields are included in the {all_fields} notification merge tag.
 
 = Can exclusions be different for different notifications? =
 
@@ -128,19 +181,20 @@ Yes. Individual sub-fields can be excluded.
 == Changelog ==
 
 = 1.1.3 =
-* Added global field exclusions.
-* Added notification-specific exclusions.
+
+* Added global field exclusion configuration.
+* Added notification-specific field exclusion configuration.
 * Added sub-field support.
-* Added configuration import and export.
+* Added JSON configuration import and export.
 * Added built-in diagnostics.
 * Added WordPress admin test runner.
 * Added CLI test runner without Composer.
 * Improved validation and sanitization.
 * Improved notification context handling.
-* Improved `{all_fields}` filtering.
+* Improved {all_fields} filtering.
 * Added automatic cleanup of obsolete field exclusions.
 
 == Upgrade Notice ==
 
 = 1.1.3 =
-Initial documented release with global and notification-specific field filtering, built-in diagnostics, and CLI testing.
+Improved field filtering, notification-specific exclusions, sub-field support, diagnostics, and configuration management.
